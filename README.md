@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)
 
-Simple Go program that fetches the current BTC price from multiple centralized exchanges (Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid, Kraken), prints them side by side, and shows the best bid/ask and spread.
+Simple Go program that fetches the current BTC price from multiple centralized exchanges (Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid, Kraken, MEXC), prints them side by side, and shows the best bid/ask and spread.
 
 ## Features
 
@@ -17,6 +17,7 @@ Simple Go program that fetches the current BTC price from multiple centralized e
   - Bitget (`BTCUSDT`, spot)
   - Hyperliquid (BTC perp mid via `allMids`)
   - Kraken (`XBTUSD`)
+  - MEXC (`BTCUSDT`)
 - **Concurrent requests** to all exchanges using goroutines and channels.
 - **Unified result type** so all exchanges report back in the same format.
 - **Best bid / best ask / spread** calculation printed to the console.
@@ -24,7 +25,7 @@ Simple Go program that fetches the current BTC price from multiple centralized e
 ## Requirements
 
 - Go toolchain installed (Go 1.21+ is recommended; `go.mod` currently declares `go 1.24.1`).
-- Internet connection (the program calls the public REST APIs of Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid, and Kraken).
+- Internet connection (the program calls the public REST APIs of Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid, Kraken, and MEXC).
 
 ## Getting started
 
@@ -81,7 +82,7 @@ The order of the lines may change between runs because each exchange call is don
 | 6  | Bitget                 | `BTCUSDT` (spot)  | ✅        |
 | 7  | Gate.io                | `BTCUSDT`         | ❓        |
 | 8  | KuCoin                 | `BTCUSDT`         | ❓        |
-| 9  | MEXC                   | `BTCUSDT`         | ❓        |
+| 9  | MEXC                   | `BTCUSDT`         | ✅        |
 | 10 | HTX (Huobi)            | `BTCUSDT`         | ❓        |
 | 11 | Crypto.com Exchange    | `BTCUSD`          | ❓        |
 | 12 | Bitfinex               | `BTCUSD`          | ❓        |
@@ -109,7 +110,7 @@ The order of the lines may change between runs because each exchange call is don
 | 34 | Bitunix                | `BTCUSDT`         | ❓        |
 | 35 | Hyperliquid            | BTC perp mid      | ✅        |
 
-✅ = implemented in this repo (currently 7 CEX + 1 perp DEX-style venue). ❓ = not implemented yet.
+✅ = implemented in this repo (currently 8 CEX + 1 perp DEX-style venue). ❓ = not implemented yet.
 
 ## Project structure
 
@@ -123,6 +124,7 @@ The order of the lines may change between runs because each exchange call is don
 │   ├── bitget.go       # FetchBitget: Bitget REST API client
 │   ├── hyperliquid.go  # FetchHyperliquid: Hyperliquid REST API client
 │   ├── kraken.go       # FetchKraken: Kraken REST API client
+│   ├── mexc.go         # FetchMEXC: MEXC REST API client
 │   └── types.go        # PriceResult type shared by all exchanges
 ├── main.go             # Orchestrates concurrent fetches and prints results
 └── go.mod              # Go module definition (module "go-btc")
@@ -136,7 +138,7 @@ All exchange-specific logic lives in the `exchanges` package:
   - `Exchange string`
   - `Price float64`
   - `Err error`
-- `FetchBinance`, `FetchOKX`, `FetchCoinbase`, `FetchBybit`, `FetchBitget`, `FetchHyperliquid`, `FetchKraken` each:
+- `FetchBinance`, `FetchOKX`, `FetchCoinbase`, `FetchBybit`, `FetchBitget`, `FetchHyperliquid`, `FetchKraken`, `FetchMEXC` each:
   - Call the corresponding public REST endpoint.
   - Parse the JSON response.
   - Convert the price string to `float64`.
@@ -155,7 +157,8 @@ All exchange-specific logic lives in the `exchanges` package:
   - `go exchanges.FetchBitget(ch)`
   - `go exchanges.FetchHyperliquid(ch)`
   - `go exchanges.FetchKraken(ch)`
-- Collects results from the channel (currently 7: Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid, Kraken).
+  - `go exchanges.FetchMEXC(ch)`
+- Collects results from the channel (currently 8: Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid, Kraken, MEXC).
 - Prints the per-exchange prices.
 - Computes and prints:
   - Best bid (lowest price)
