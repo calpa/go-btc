@@ -1,6 +1,10 @@
 # go-btc
 
-Simple Go program that fetches the current BTC price from multiple centralized exchanges (Binance, OKX, Coinbase, Bybit, Bitget), prints them side by side, and shows the best bid/ask and spread.
+![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?style=for-the-badge&logo=go)
+![Status](https://img.shields.io/badge/status-experimental-orange?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+
+Simple Go program that fetches the current BTC price from multiple centralized exchanges (Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid), prints them side by side, and shows the best bid/ask and spread.
 
 ## Features
 
@@ -10,6 +14,7 @@ Simple Go program that fetches the current BTC price from multiple centralized e
   - Coinbase (`BTC-USD`)
   - Bybit (`BTCUSDT`, spot)
   - Bitget (`BTCUSDT`, spot)
+  - Hyperliquid (BTC perp mid via `allMids`)
 - **Concurrent requests** to all exchanges using goroutines and channels.
 - **Unified result type** so all exchanges report back in the same format.
 - **Best bid / best ask / spread** calculation printed to the console.
@@ -17,7 +22,7 @@ Simple Go program that fetches the current BTC price from multiple centralized e
 ## Requirements
 
 - Go toolchain installed (Go 1.21+ is recommended; `go.mod` currently declares `go 1.24.1`).
-- Internet connection (the program calls the public REST APIs of Binance, OKX, Coinbase, Bybit, and Bitget).
+- Internet connection (the program calls the public REST APIs of Binance, OKX, Coinbase, Bybit, Bitget, and Hyperliquid).
 
 ## Getting started
 
@@ -45,17 +50,18 @@ go run main.go
 Example output:
 
 ```text
-Exchange   Price (USD)
+Exchange      Price (USD)
 ---------------------------
-Coinbase   95522.01
-OKX        95601.60
-Bybit      95602.90
-Binance    95589.51
-Bitget     95411.26
+Bybit           95306.10
+Coinbase        95294.12
+Binance         95311.53
+OKX             95312.30
+Hyperliquid     95312.50
+Bitget          95312.54
 
-Best Bid: 95411.26 ( Bitget )
-Best Ask: 95602.9 ( Bybit )
-Spread: 191.6399999999935
+Best Bid: 95294.115 ( Coinbase )
+Best Ask: 95312.54 ( Bitget )
+Spread: 18.42499999998836
 ```
 
 The order of the lines may change between runs because each exchange call is done concurrently.
@@ -65,14 +71,15 @@ The order of the lines may change between runs because each exchange call is don
 ```text
 .
 ├── exchanges/
-│   ├── binance.go    # FetchBinance: Binance REST API client
-│   ├── coinbase.go   # FetchCoinbase: Coinbase REST API client
-│   ├── okx.go        # FetchOKX: OKX REST API client
-│   ├── bybit.go      # FetchBybit: Bybit REST API client
-│   ├── bitget.go     # FetchBitget: Bitget REST API client
-│   └── types.go      # PriceResult type shared by all exchanges
-├── main.go           # Orchestrates concurrent fetches and prints results
-└── go.mod            # Go module definition (module "go-btc")
+│   ├── binance.go      # FetchBinance: Binance REST API client
+│   ├── coinbase.go     # FetchCoinbase: Coinbase REST API client
+│   ├── okx.go          # FetchOKX: OKX REST API client
+│   ├── bybit.go        # FetchBybit: Bybit REST API client
+│   ├── bitget.go       # FetchBitget: Bitget REST API client
+│   ├── hyperliquid.go  # FetchHyperliquid: Hyperliquid REST API client
+│   └── types.go        # PriceResult type shared by all exchanges
+├── main.go             # Orchestrates concurrent fetches and prints results
+└── go.mod              # Go module definition (module "go-btc")
 ```
 
 ### `exchanges` package
@@ -83,7 +90,7 @@ All exchange-specific logic lives in the `exchanges` package:
   - `Exchange string`
   - `Price float64`
   - `Err error`
-- `FetchBinance`, `FetchOKX`, `FetchCoinbase`, `FetchBybit`, `FetchBitget` each:
+- `FetchBinance`, `FetchOKX`, `FetchCoinbase`, `FetchBybit`, `FetchBitget`, `FetchHyperliquid` each:
   - Call the corresponding public REST endpoint.
   - Parse the JSON response.
   - Convert the price string to `float64`.
@@ -100,7 +107,8 @@ All exchange-specific logic lives in the `exchanges` package:
   - `go exchanges.FetchCoinbase(ch)`
   - `go exchanges.FetchBybit(ch)`
   - `go exchanges.FetchBitget(ch)`
-- Collects results from the channel (currently 5: Binance, OKX, Coinbase, Bybit, Bitget).
+  - `go exchanges.FetchHyperliquid(ch)`
+- Collects results from the channel (currently 6: Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid).
 - Prints the per-exchange prices.
 - Computes and prints:
   - Best bid (lowest price)
@@ -120,4 +128,8 @@ Here are some ideas to extend this into a bigger engineering project:
 
 ## License
 
-No explicit license is set yet. Add a LICENSE file if you plan to open-source or share this more broadly.
+This project is licensed under the **MIT License**.
+
+Copyright (c) 2025 **Calpa Liu** <calpaliu@gmail.com>
+
+See the [LICENSE](./LICENSE) file for full license text.

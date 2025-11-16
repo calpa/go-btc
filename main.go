@@ -14,13 +14,14 @@ func main() {
 	go exchanges.FetchCoinbase(ch)
 	go exchanges.FetchBybit(ch)
 	go exchanges.FetchBitget(ch)
+	go exchanges.FetchHyperliquid(ch)
 
-	results := make([]exchanges.PriceResult, 0, 5)
-	for range 5 {
+	results := make([]exchanges.PriceResult, 0, 6)
+	for range 6 {
 		results = append(results, <-ch)
 	}
 
-	fmt.Println("Exchange   Price (USD)")
+	fmt.Println("Exchange      Price (USD)")
 	fmt.Println("---------------------------")
 
 	bestBid := 1e12 // large starting value
@@ -33,7 +34,7 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("%-10s %.2f\n", r.Exchange, r.Price)
+		fmt.Printf("%-15s %.2f\n", r.Exchange, r.Price)
 
 		if r.Price < bestBid {
 			bestBid = r.Price
