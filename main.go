@@ -15,9 +15,10 @@ func main() {
 	go exchanges.FetchBybit(ch)
 	go exchanges.FetchBitget(ch)
 	go exchanges.FetchHyperliquid(ch)
+	go exchanges.FetchKraken(ch)
 
-	results := make([]exchanges.PriceResult, 0, 6)
-	for range 6 {
+	results := make([]exchanges.PriceResult, 0, 7)
+	for range 7 {
 		results = append(results, <-ch)
 	}
 
