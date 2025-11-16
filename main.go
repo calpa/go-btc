@@ -13,9 +13,10 @@ func main() {
 	go exchanges.FetchOKX(ch)
 	go exchanges.FetchCoinbase(ch)
 	go exchanges.FetchBybit(ch)
+	go exchanges.FetchBitget(ch)
 
-	results := make([]exchanges.PriceResult, 0, 4)
-	for range 4 {
+	results := make([]exchanges.PriceResult, 0, 5)
+	for range 5 {
 		results = append(results, <-ch)
 	}
 

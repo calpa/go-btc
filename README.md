@@ -1,6 +1,6 @@
 # go-btc
 
-Simple Go program that fetches the current BTC price from multiple centralized exchanges (Binance, OKX, Coinbase), prints them side by side, and shows the best bid/ask and spread.
+Simple Go program that fetches the current BTC price from multiple centralized exchanges (Binance, OKX, Coinbase, Bybit, Bitget), prints them side by side, and shows the best bid/ask and spread.
 
 ## Features
 
@@ -8,6 +8,8 @@ Simple Go program that fetches the current BTC price from multiple centralized e
   - Binance (`BTCUSDT`)
   - OKX (`BTC-USDT`)
   - Coinbase (`BTC-USD`)
+  - Bybit (`BTCUSDT`, spot)
+  - Bitget (`BTCUSDT`, spot)
 - **Concurrent requests** to all exchanges using goroutines and channels.
 - **Unified result type** so all exchanges report back in the same format.
 - **Best bid / best ask / spread** calculation printed to the console.
@@ -15,7 +17,7 @@ Simple Go program that fetches the current BTC price from multiple centralized e
 ## Requirements
 
 - Go toolchain installed (Go 1.21+ is recommended; `go.mod` currently declares `go 1.24.1`).
-- Internet connection (the program calls the public REST APIs of Binance, OKX, and Coinbase).
+- Internet connection (the program calls the public REST APIs of Binance, OKX, Coinbase, Bybit, and Bitget).
 
 ## Getting started
 
@@ -45,13 +47,15 @@ Example output:
 ```text
 Exchange   Price (USD)
 ---------------------------
-Coinbase   95643.68
-OKX        95703.40
-Binance    95687.90
+Coinbase   95522.01
+OKX        95601.60
+Bybit      95602.90
+Binance    95589.51
+Bitget     95411.26
 
-Best Bid: 95643.675 ( Coinbase )
-Best Ask: 95703.4 ( OKX )
-Spread: 59.72499999999127
+Best Bid: 95411.26 ( Bitget )
+Best Ask: 95602.9 ( Bybit )
+Spread: 191.6399999999935
 ```
 
 The order of the lines may change between runs because each exchange call is done concurrently.
@@ -64,6 +68,8 @@ The order of the lines may change between runs because each exchange call is don
 │   ├── binance.go    # FetchBinance: Binance REST API client
 │   ├── coinbase.go   # FetchCoinbase: Coinbase REST API client
 │   ├── okx.go        # FetchOKX: OKX REST API client
+│   ├── bybit.go      # FetchBybit: Bybit REST API client
+│   ├── bitget.go     # FetchBitget: Bitget REST API client
 │   └── types.go      # PriceResult type shared by all exchanges
 ├── main.go           # Orchestrates concurrent fetches and prints results
 └── go.mod            # Go module definition (module "go-btc")
@@ -77,7 +83,7 @@ All exchange-specific logic lives in the `exchanges` package:
   - `Exchange string`
   - `Price float64`
   - `Err error`
-- `FetchBinance`, `FetchOKX`, `FetchCoinbase` each:
+- `FetchBinance`, `FetchOKX`, `FetchCoinbase`, `FetchBybit`, `FetchBitget` each:
   - Call the corresponding public REST endpoint.
   - Parse the JSON response.
   - Convert the price string to `float64`.
@@ -92,7 +98,9 @@ All exchange-specific logic lives in the `exchanges` package:
   - `go exchanges.FetchBinance(ch)`
   - `go exchanges.FetchOKX(ch)`
   - `go exchanges.FetchCoinbase(ch)`
-- Collects three results from the channel.
+  - `go exchanges.FetchBybit(ch)`
+  - `go exchanges.FetchBitget(ch)`
+- Collects results from the channel (currently 5: Binance, OKX, Coinbase, Bybit, Bitget).
 - Prints the per-exchange prices.
 - Computes and prints:
   - Best bid (lowest price)
