@@ -3,6 +3,7 @@
 ![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?style=for-the-badge&logo=go)
 ![Status](https://img.shields.io/badge/status-experimental-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)
 
 Simple Go program that fetches the current BTC price from multiple centralized exchanges (Binance, OKX, Coinbase, Bybit, Bitget, Hyperliquid, Kraken), prints them side by side, and shows the best bid/ask and spread.
 
@@ -165,12 +166,21 @@ All exchange-specific logic lives in the `exchanges` package:
 
 Here are some ideas to extend this into a bigger engineering project:
 
-- Add more exchanges (e.g., Bybit, Kraken, Bitfinex) by creating new `*.go` files in `exchanges/` with new `FetchX` functions.
+- Add more exchanges by creating new `*.go` files in `exchanges/` with new `FetchX` functions.
 - Introduce an `Exchange` interface so you can register exchanges dynamically.
 - Add configurable quote/base pairs instead of hardcoding BTC/USDT and BTC/USD.
 - Add unit tests for the JSON parsing and `PriceResult` handling.
 - Implement timeouts and retry logic with `context.Context` and custom HTTP clients.
 - Export the data via HTTP or gRPC instead of printing to stdout.
+
+## Contributing / PRs
+
+Pull requests are very welcome:
+
+- **Small, focused changes** are preferred (one feature or fix per PR).
+- If you add a new exchange, follow the existing `FetchX` pattern in the `exchanges` package and update the README support matrix.
+- Keep the CLI output simple and avoid adding heavy dependencies.
+- For larger changes, consider opening an issue or discussion first to outline your idea.
 
 ## License
 
